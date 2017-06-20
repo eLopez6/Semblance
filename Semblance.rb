@@ -19,14 +19,13 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
         button("Start Semblance") {
             Shoes.app :fullscreen => true do 
                 @slide = nil
-                stack(){
-                    images = Dir.entries(folder)
-                    imagepath = (folder + "\\" + images[rand(images.length)])
+                stack(){                    
+                    imagepath = generate_random_image_path(folder)
                     @slide = image(imagepath)
 
                     keypress do |k|
                         if (k.inspect == ":right") then
-                            @slide.path = generateImagePath(folder, images)
+                            @slide.path = generate_random_image_path(folder)
                         end
 
                         if (k.inspect == ":escape") then
@@ -40,28 +39,42 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
 end
 
     
-        
-            
-        
-            
-                
-                        
+def generate_random_image_path(folder)
+    images_list = Dir.entries(folder)
+    accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
+    cur_image_path = images_list[rand(images_list.length)]
+    while (accepted_exts.include? File.extname(cur_image_path)) then 
+        return(folder + "\\" + cur_image_path)
+    end 
+end
+
+# TODO Refactor this into two methods 
+# This method should be called by another method which handles the time calculation
+def time_slideshow(images)
+    
 
 
-# def generateImagePath(folder, imagesList)
-#     return  (folder + "\\" + imagesList[rand(imagesList.length)])
-# end
+
+    sleep(3)
+end
+
+def run_slideshow(folder, shuffle)
+    images_list = Dir.entries(folder)
+    accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
+    cur_image_path = images_list[rand(images_list.length)]
+    if (shuffle) then 
+        images_list = images_list.shuffle
+    end
+
+end 
 
 
-#TODO 
-# keypress(|key| ...), will allow me to use hotkeys like waiting for an arrow to load the next picture 
-#REMEMBER : image(PATH), returns Shoes::Image, 
-# or apparently just image "PATH" 
+# TODO Use an INI or something like it to store configuration settings 
+# Flow of configurations:
+    # Start up  --  Will include a new menu for configuring the INI 
+    # Check for INI with config settings
+    #     Not there: create a new INI 
+    
+    # INI Configuration Options
 
-
-# folderpath = gets.chomp()
-
-# images = Dir.entries(folderpath)
-# imagepath = images[rand(images.length)]
-# puts folderpath + imagepath
-            
+    
