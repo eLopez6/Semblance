@@ -48,15 +48,72 @@ def generate_random_image_path(folder)
     end 
 end
 
-# TODO Refactor this into two methods 
-# This method should be called by another method which handles the time calculation
-def time_slideshow(images)
+
+class Slideshow
+    @original_images_list = nil
+    @shuffled_images_list = nil
+    @current_images_list = nil 
+    @images_length = 0
+    @accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
+    @shuffle = false 
+    @slide_length = 0
+    @current_index = 0 
     
 
+    def initialize(folder, shuffle, slide_length)
+        @original_images_list = Dir.entries(folder)
+        @images_length = @original_images_list.length 
+        @current_images_list = @original_images_list
+        if (shuffle) then 
+            @shuffled_images_list = @original_images_list.shuffle
+            @shuffle = shuffle
+        end 
+        @slide_length = slide_length
+    end
+
+    def next_image()
+        image_index = @current_index
+        end_of_list = (@current_index + 1) > @images_length
+        img_path = @current_images_list[image_index]
+
+        if (end_of_list)then
+            @current_index = 0
+        else
+            @current_index = @current_index + 1
+        end
+
+        return img_path
+    end
+
+    # Note for bug: @images length in next and prev image should probably be images_length - 1
+    # they are used for indexing, which means I will need another field in the class for length and max_index or something
+
+    def prev_image()
+        image_index = @current_index
+        begin_of_list = (@current_index + 1) > @images_length
+        img_path = @current_images_list[image_index]
+
+        if (begin_of_list)then 
+            @current_index = @images_length - 1
+        else
+            @current_index = @current_index - 1
+        end
+        
+        return img_path
+    end
+    
+    
+
+    # when running, have the loop be true for shoes, inside class, return next image index as method in slideshow 
+    
+end 
 
 
-    sleep(3)
-end
+
+
+
+
+
 
 def run_slideshow(folder, shuffle)
     images_list = Dir.entries(folder)
