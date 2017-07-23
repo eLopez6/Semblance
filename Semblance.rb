@@ -33,7 +33,7 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 background "#000000" 
 
                 stack(){
-                    slideshow_start(selected_folder, false)  
+                    slideshow_start(selected_folder, true)  
 
                     slide = image(next_image())
                     keypress do |k|
@@ -78,10 +78,12 @@ end
 def slideshow_start(folder, shuffle_set)
     $original_images_list = Dir.entries(folder).select {|f| !File.directory? f}
     $images_length = $original_images_list.length 
-    $current_images_list = $original_images_list
     if (shuffle_set) then 
         $shuffled_images_list = $original_images_list.shuffle
         $shuffle = shuffle_set
+        $current_images_list = $shuffled_images_list
+    else
+        $current_images_list = $original_images_list
     end 
     $folder = folder
 end
