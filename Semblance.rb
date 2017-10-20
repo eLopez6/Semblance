@@ -33,6 +33,11 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                     slideshow_start(selected_folder, false)
 
                     slide = image(next_image)
+
+                    every(3) do
+                        slide.path = next_image
+                    end
+
                     keypress do |k|
                         if (k.inspect == ":right") then
                             slide.path = next_image
