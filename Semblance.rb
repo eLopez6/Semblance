@@ -28,19 +28,25 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 @slide_length = 0
                 @current_index = 0
                 @folder = ''
+                @screen_height = 1280
+                @screen_width = 800
 
                 stack() {
-                    slideshow_start(selected_folder, false)
+                    slideshow_start(selected_folder, false, 3)
 
                     slide = image(next_image)
 
-                    every(3) do
+                    every(@slide_length) do
                         slide.path = next_image
+                        dimensions = scale_image(slide.full_width, slide.full_height, @screen_height, @screen_width)
+                        slide.style(:width => dimensions[0], :height => dimensions[1])
                     end
 
                     keypress do |k|
                         if (k.inspect == ":right") then
                             slide.path = next_image
+                            dimensions = scale_image(slide.full_width, slide.full_height, @screen_height, @screen_width)
+                            slide.style(:width => dimensions[0], :height => dimensions[1])
                         end
 
                         if (k.inspect == ":left") then
@@ -67,17 +73,7 @@ def generate_random_image_path(folder)
     end
 end
 
-# def run_slideshow(folder, shuffle)
-#     images_list = Dir.entries(folder)
-#     accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
-#     cur_image_path = images_list[rand(images_list.length)]
-#     if (shuffle) then
-#         images_list = images_list.shuffle
-#     end
-
-# end
-
-def slideshow_start(folder, shuffle_set)
+def slideshow_start(folder, shuffle_set, slide_length)
     @original_images_list = Dir.entries(folder).select {|f| !File.directory? f}
     @images_length = @original_images_list.length
     if (shuffle_set) then
@@ -88,6 +84,7 @@ def slideshow_start(folder, shuffle_set)
         @current_images_list = @original_images_list
     end
     @folder = folder
+    @slide_length = slide_length
 end
 
 def next_image
@@ -118,6 +115,48 @@ def prev_image
     image_index = @current_index
     img_path = @current_images_list[image_index]
     return @folder + '/' + img_path
+end
+
+def scale_image(x1, y1, x2, y2)
+    aspect_ratio = x1/y1
+    screen_ratio = x2/y2
+
+
+    if x1 > x2 or y1 > y2 then
+        if screen_ratio > 1 then                        # horizontal screen
+            if aspect_ratio <= 1 then                   # vertical image
+                width = x2
+                height = width / aspect_ratio
+            else                                        # horizontal image
+                height = y2
+                width = height * aspect_ratio
+            end
+        else                                            # vertical screen
+            if aspect_ratio >= 1 then                   # horizontal image
+                height = y2
+                width = height * aspect_ratio
+            else                                        # vertical image
+                width = x2
+                height = width / aspect_ratio
+            end
+        end
+        return width, height
+    else
+        return x1, y1
+    end
+end
+
+
+# TODO remove this from method so that I can call this on every image
+# Not sure if this actually works in Ruby (calling displace and stuff)
+def center_image(w, h, x2, y2)
+    q = x2 - w
+    q = q / 2
+
+    r = y2 - h
+    r = r / 2
+
+    return q, r
 end
 
 # TODO Use an INI or something like it to store configuration settings
