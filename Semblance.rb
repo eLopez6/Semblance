@@ -28,9 +28,15 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 @slide_length = 0
                 @current_index = 0
                 @folder = ''
-                @screen_width = 1280
-                @screen_height = 800
 
+                if Gem.win_platform? then
+                    close()
+                else
+                    @screen_width, @screen_height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten    # Not sure what is actually happening here
+                    @screen_width = @screen_width.to_i
+                    @screen_height = @screen_height.to_i
+                end
+                
                 stack() {
                     slideshow_start(selected_folder, false, 3)
                     x1 = 0
