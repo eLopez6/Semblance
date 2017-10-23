@@ -51,6 +51,8 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
 
                         if (k.inspect == ":left") then
                             slide.path = prev_image
+                            dimensions = scale_image(slide.full_width, slide.full_height, @screen_height, @screen_width)
+                            slide.style(:width => dimensions[0], :height => dimensions[1])
                         end
 
                         if (k.inspect == ":escape") then
@@ -100,9 +102,6 @@ def next_image
     return @folder + '/' + img_path
 end
 
-# Note for bug: @images length in next and prev image should probably be images_length - 1
-# they are used for indexing, which means I will need another field in the class for length and max_index or something
-
 def prev_image
     begin_of_list = (@current_index - 1) < 0
 
@@ -118,29 +117,20 @@ def prev_image
 end
 
 def scale_image(x1, y1, x2, y2)
-    aspect_ratio = x1/y1
-    screen_ratio = x2/y2
+    aspect_ratio = x1.to_f / y1.to_f
+    screen_ratio = x2.to_f / y2.to_f
 
-
-    if x1 > x2 or y1 > y2 then
-        if screen_ratio > 1 then                        # horizontal screen
-            if aspect_ratio <= 1 then                   # vertical image
-                width = x2
-                height = width / aspect_ratio
-            else                                        # horizontal image
-                height = y2
-                width = height * aspect_ratio
-            end
-        else                                            # vertical screen
-            if aspect_ratio >= 1 then                   # horizontal image
-                height = y2
-                width = height * aspect_ratio
-            else                                        # vertical image
-                width = x2
-                height = width / aspect_ratio
-            end
+    if x1 > x2 and y1 > y2 then
+        if aspect_ratio <= 1 then                   # vertical image
+            height = y2.to_f
+            width = height * aspect_ratio
+        else                                        # horizontal image
+            width = x2.to_f
+            height = width / aspect_ratio
         end
-        return width, height
+
+        return width.to_i, height.to_i
+
     else
         return x1, y1
     end
@@ -166,11 +156,3 @@ end
     #     Not there: create a new INI
 
     # INI Configuration Options
-
-
-=begin
-Found timer(seconds) in Shoes
-Use this for slideshow control
-timer(cofig_seconds) do
-    slide.path = next_image
-=end
