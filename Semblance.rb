@@ -28,13 +28,10 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 @folder = ''
 
                 if Gem.win_platform? then
-                    SM_CXSCREEN       =     0
-                    SM_CYSCREEN       =     1
-
-                    user32 = DL.dlopen("user32")
-                    get_system_metrics = user32['GetSystemMetrics', 'ILI']
-                    x, tmp = get_system_metrics.call(SM_CXSCREEN, 0)
-                    y, tmp = get_system_metrics.call(SM_CYSCREEN, 1)
+                    @screen_width = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenWidth \s+ : (\d+)/).flatten
+                    @screen_width = @screen_width.first.to_i
+                    @screen_height = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenHeight \s+ : (\d+)/).flatten
+                    @screen_height = @screen_height.first.to_i
                 else
                     @screen_width, @screen_height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten    # Not sure what is actually happening here
                     @screen_width = @screen_width.to_i
