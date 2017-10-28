@@ -46,31 +46,20 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                     x1 = 0
                     y1 = 0
 
-                    slide = image(next_image)
-                    x1, y1 = scale_image(slide.full_width, slide.full_height, @screen_width, @screen_height)
-                    w, h = center_image(x1, y1, @screen_width, @screen_height)
-                    slide.style(:width => x1, :height => y1, :displace_left => w, :displace_top => h)
+                    slide = image
+                    new_slide(slide, true)
 
                     every(@slide_length) do
-                        slide.path = next_image
-                        x1, y1 = scale_image(slide.full_width, slide.full_height, @screen_width, @screen_height)
-                        w, h = center_image(x1, y1, @screen_width, @screen_height)
-                        slide.style(:width => x1, :height => y1, :displace_left => w, :displace_top => h)
+                        new_slide(slide, true)
                     end
 
                     keypress do |k|
                         if (k.inspect == ":right") then
-                            slide.path = next_image
-                            x1, y1 = scale_image(slide.full_width, slide.full_height, @screen_width, @screen_height)
-                            w, h = center_image(x1, y1, @screen_width, @screen_height)
-                            slide.style(:width => x1, :height => y1, :displace_left => w, :displace_top => h)
+                            new_slide(slide, true)
                         end
 
                         if (k.inspect == ":left") then
-                            slide.path = prev_image
-                            x1, y1 = scale_image(slide.full_width, slide.full_height, @screen_width, @screen_height)
-                            w, h = center_image(x1, y1, @screen_width, @screen_height)
-                            slide.style(:width => x1, :height => y1, :displace_left => w, :displace_top => h)
+                            new_slide(slide, false)
                         end
 
                         if (k.inspect == ":escape") then
@@ -91,6 +80,17 @@ def generate_random_image_path(folder)
     while (accepted_exts.include? File.extname(cur_image_path)) do
         return(folder + "/" + cur_image_path)
     end
+end
+
+def new_slide(slide, forward)
+    if (forward) then
+        slide.path = next_image
+    else
+        slide.path = prev_image
+    end
+    x1, y1 = scale_image(slide.full_width, slide.full_height, @screen_width, @screen_height)
+    w, h = center_image(x1, y1, @screen_width, @screen_height)
+    slide.style(:width => x1, :height => y1, :displace_left => w, :displace_top => h)
 end
 
 def slideshow_start(folder, shuffle_set, slide_length)
