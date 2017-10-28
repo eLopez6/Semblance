@@ -6,8 +6,6 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
     font: "Century Gothic",
     stroke: white)
 
-    $accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
-
 	flow(margin_left:'38%', margin_top:'75%'){
 
         selected_folder = nil
@@ -30,13 +28,19 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 @folder = ''
 
                 if Gem.win_platform? then
-                    close()
+                    SM_CXSCREEN       =     0
+                    SM_CYSCREEN       =     1
+
+                    user32 = DL.dlopen("user32")
+                    get_system_metrics = user32['GetSystemMetrics', 'ILI']
+                    x, tmp = get_system_metrics.call(SM_CXSCREEN, 0)
+                    y, tmp = get_system_metrics.call(SM_CYSCREEN, 1)
                 else
                     @screen_width, @screen_height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten    # Not sure what is actually happening here
                     @screen_width = @screen_width.to_i
                     @screen_height = @screen_height.to_i
                 end
-                
+
                 stack() {
                     slideshow_start(selected_folder, false, 3)
                     x1 = 0
