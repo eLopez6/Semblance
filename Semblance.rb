@@ -72,6 +72,7 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
     }
 end
 
+# Methods 
 
 def generate_random_image_path(folder)
     images_list = Dir.entries(folder)
@@ -95,10 +96,15 @@ end
 
 def slideshow_start(folder, shuffle_set, slide_length)
     @original_images_list = Dir.entries(folder).select {|f| !File.directory? f}
-    @images_length = @original_images_list.length
+    accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
+    # Remove from the slideshow files that are not images (ie, webms)
+    @original_images_list = @original_images_list.select {|elem|
+        accepted_exts.include? File.extname(elem)
+    }
+    @images_length = @original_images_list.length    # makes code cleaner
     if (shuffle_set) then
-        @shuffled_images_list = @original_images_list.shuffle
         @shuffle = shuffle_set
+        @shuffled_images_list = @original_images_list.shuffle
         @current_images_list = @shuffled_images_list
     else
         @current_images_list = @original_images_list
