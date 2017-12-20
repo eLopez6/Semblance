@@ -1,3 +1,33 @@
+Shoes.setup do
+    gem 'inifile'
+end
+
+require 'inifile'
+
+# Setup of INI for accessing default values
+if (File.file?('./slides.ini')) then
+    ini_file = IniFile.load('./slides.ini')
+else
+    # Create new IniFile
+    ini_file = IniFile.new
+    ini_file["Default"] = {
+        "Length" => '3',
+        "Shuffle" => '0'
+    }
+    ini_file.filename = "./slides.ini"
+    ini_file.write()
+end
+
+# Get default values from a config file
+data = ini_file["DEFAULT"]
+
+configured_slide_length = data["Length"].to_i
+if data["Shuffle"] == '0' then
+    configured_shuffle = false
+else
+    configured_shuffle = true
+end
+
 Shoes.app(title: "Semblance", width: 1200, height: 800) do
     background "#7A1D1F"
     title("Semblance",
@@ -7,8 +37,7 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
     stroke: white)
 
 	flow(margin_left:'38%', margin_top:'75%'){
-
-        selected_folder = nil
+        selected_folder = ''
 
 	    button("Select Folder") {
             selected_folder = ask_open_folder
@@ -23,7 +52,7 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 @current_images_list = nil
                 @images_length = 0
                 @shuffle = false
-                @slide_length = 0
+                @slide_length = 3
                 @current_index = 0
                 @folder = ''
 
@@ -39,7 +68,8 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
                 end
 
                 stack() {
-                    slideshow_start(selected_folder, false, 3)
+                    slideshow_start(selected_folder, configured_shuffle,
+                    configured_slide_length)
                     x1 = 0
                     y1 = 0
 
@@ -69,16 +99,7 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
     }
 end
 
-# Methods 
-
-def generate_random_image_path(folder)
-    images_list = Dir.entries(folder)
-    accepted_exts = [".jpg", ".bmp", ".png", ".gif"]
-    cur_image_path = images_list[rand(images_list.length)]
-    while (accepted_exts.include? File.extname(cur_image_path)) do
-        return(folder + "/" + cur_image_path)
-    end
-end
+# Methods
 
 def new_slide(slide, forward)
     if (forward) then
