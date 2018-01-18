@@ -36,67 +36,74 @@ Shoes.app(title: "Semblance", width: 1200, height: 800) do
     font: "Century Gothic",
     stroke: white)
 
-	flow(margin_left:'38%', margin_top:'75%'){
-        selected_folder = ''
-
-	    button("Select Folder") {
-            selected_folder = ask_open_folder
+    stack() {
+        flow(margin_left:'38%', margin_top:'40%') {
+            splash = image("./RUby23.png")
         }
+        flow(margin_left:'38%', margin_top:'15%'){
+            selected_folder = ''
 
-        button("Start Semblance") {
-            Shoes.app(fullscreen: true) do
-                background "#000000"
+            button("Select Folder") {
+                selected_folder = ask_open_folder
+            }
 
-                @original_images_list = nil
-                @shuffled_images_list = nil
-                @current_images_list = nil
-                @images_length = 0
-                @shuffle = false
-                @slide_length = 3
-                @current_index = 0
-                @folder = ''
+            button("Start Semblance") {
+                Shoes.app(fullscreen: true) do
+                    background "#000000"
 
-                if Gem.win_platform? then
-                    @screen_width = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenWidth \s+ : (\d+)/).flatten
-                    @screen_width = @screen_width.first.to_i
-                    @screen_height = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenHeight \s+ : (\d+)/).flatten
-                    @screen_height = @screen_height.first.to_i
-                else
-                    @screen_width, @screen_height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten    # Not sure what is actually happening here
-                    @screen_width = @screen_width.to_i
-                    @screen_height = @screen_height.to_i
-                end
+                    @original_images_list = nil
+                    @shuffled_images_list = nil
+                    @current_images_list = nil
+                    @images_length = 0
+                    @shuffle = false
+                    @slide_length = 3
+                    @current_index = 0
+                    @folder = ''
 
-                stack() {
-                    slideshow_start(selected_folder, configured_shuffle,
-                    configured_slide_length)
-                    x1 = 0
-                    y1 = 0
-
-                    slide = image
-                    new_slide(slide, true)
-
-                    every(@slide_length) do
-                        new_slide(slide, true)
+                    if Gem.win_platform? then
+                        @screen_width = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenWidth \s+ : (\d+)/).flatten
+                        @screen_width = @screen_width.first.to_i
+                        @screen_height = `powershell Get-WmiObject -Class Win32_DesktopMonitor`.scan(/ScreenHeight \s+ : (\d+)/).flatten
+                        @screen_height = @screen_height.first.to_i
+                    else
+                        @screen_width, @screen_height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten    # Not sure what is actually happening here
+                        @screen_width = @screen_width.to_i
+                        @screen_height = @screen_height.to_i
                     end
 
-                    keypress do |k|
-                        if (k.inspect == ":right") then
+                    stack() {
+                        slideshow_start(selected_folder, configured_shuffle,
+                        configured_slide_length)
+                        x1 = 0
+                        y1 = 0
+
+                        slide = image
+                        new_slide(slide, true)
+
+                        every(@slide_length) do
                             new_slide(slide, true)
                         end
 
-                        if (k.inspect == ":left") then
-                            new_slide(slide, false)
-                        end
+                        keypress do |k|
+                            if (k.inspect == ":right") then
+                                new_slide(slide, true)
+                            end
 
-                        if (k.inspect == ":escape") then
-                            close()
+                            if (k.inspect == ":left") then
+                                new_slide(slide, false)
+                            end
+
+                            if (k.inspect == ":escape") then
+                                close()
+                            end
                         end
-                    end
-                }
-            end
+                    }
+                end
+            }
         }
     }
+
+
 end
 
 # Methods
@@ -186,9 +193,6 @@ def scale_image(x1, y1, x2, y2)
     end
 end
 
-
-# TODO remove this from method so that I can call this on every image
-# Not sure if this actually works in Ruby (calling displace and stuff)
 def center_image(w, h, x2, y2)
     q = x2 - w
     q = q / 2
@@ -198,11 +202,3 @@ def center_image(w, h, x2, y2)
 
     return q, r
 end
-
-# TODO Use an INI or something like it to store configuration settings
-# Flow of configurations:
-    # Start up  --  Will include a new menu for configuring the INI
-    # Check for INI with config settings
-    #     Not there: create a new INI
-
-    # INI Configuration Options
